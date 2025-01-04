@@ -14,14 +14,14 @@ const userSchema = new mongoose.Schema(
         passWord: {
             type: String,
             required: true,
-            minLength:6,
+            minLength: 6,
         },
-        profilePic:{
-            type : String,
-            default:""
+        profilePic: {
+            type: String,
+            default: ""
         }
     },
-    {timestamps:true}
+    { timestamps: true }
 )
-const User = mongoose.model("User",  userSchema)
+const User = mongoose.model("User", userSchema)
 export default User

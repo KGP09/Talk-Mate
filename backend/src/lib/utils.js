@@ -4,7 +4,6 @@ export const generateToken = (userID, res) => {
         process.env.JWT_SECRET, {
         expiresIn: "7d"
     })
-    
     res.cookie("jwt", token, {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
@@ -12,4 +11,5 @@ export const generateToken = (userID, res) => {
         secure: process.env.NODE_ENV != "development"
     })
     return token
+
 }

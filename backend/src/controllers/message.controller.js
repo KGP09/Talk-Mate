@@ -37,6 +37,7 @@ export const getMessages = async (req, res) => {
         })
     }
 }
+//have to check this endpoint!
 export const sendMessage = async (req, res) => {
     try {
         const { text, image } = req.body

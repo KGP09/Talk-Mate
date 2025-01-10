@@ -7,6 +7,7 @@ export const useAuthStore = create((set) => ({
     isSigningUp: false,
     isLoggingIn: false,
     isUpdatingProfile: false,
+    onlineUsers: [],
     isCheckingAuth: true,
     checkAuth: async () => {
         try {
@@ -45,12 +46,19 @@ export const useAuthStore = create((set) => ({
     },
     logout: async () => {
         try {
-            await axiosInstance.post("/auth/logout")
-            set({ authUser: null })
+            // Call the backend logout endpoint
+            await axiosInstance.post("/auth/logout");
+
+            // Clear the local authUser state to log the user out
+            set({ authUser: null });
+
+            // Optionally redirect the user to the login page (if using React Router)
+            window.location.href = '/login';  // Or use React Router's `navigate('/login')`
         } catch (error) {
-            console.log("Logout Error AXOIS Instance");
+            console.log("Logout Error with Axios Instance:", error);
         }
     },
+
     updateProfile: async (data) => {
         set({ isUpdatingProfile: true })
         try {

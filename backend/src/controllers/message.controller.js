@@ -7,6 +7,7 @@ export const getUsersForSideBar = async (req, res) => {
         const loggedInUserID = req.user._id;
         console.log(loggedInUserID);
         const filteredUsers = await User.find({ _id: { $ne: loggedInUserID } }).select("-passWord")
+        console.log("filtered users: ", filteredUsers);
         res.status(200).json(filteredUsers)
     } catch (error) {
         console.log("Message Controller Error!");
@@ -45,8 +46,8 @@ export const sendMessage = async (req, res) => {
         const senderId = req.user._id
         let imageURL;
         if (image) {
-            const uploadResponse = await cloudinary.uploader(image)
-            imageURL = uploadResponse(secure_url)
+            const uploadResponse = await cloudinary.uploader.upload(image)
+            imageURL = uploadResponse.secure_url
         }
         const newMessage = new Message({
             senderId, receiverId, text, image: imageURL

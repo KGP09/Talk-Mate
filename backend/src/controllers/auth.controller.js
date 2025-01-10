@@ -23,15 +23,14 @@ export const signup = async (req, res) => {
             passWord: hashPassword,
         })
         if (newUser) {
-            generateToken(newUser._id, res)
+            const token = generateToken(newUser._id, res)
             await newUser.save()
             res.status(201).json({
                 _id: newUser._id,
                 fullName: newUser.fullName,
                 mail: newUser.email,
-                profilePic: newUser.profilePic
-
-
+                profilePic: newUser.profilePic,
+                token,
             })
         } else {
             res.status(400).json({
@@ -60,12 +59,14 @@ export const login = async (req, res) => {
                 message: "Invalid Credentials!"
             })
         }
-        generateToken(user._id, res);
+        const token = generateToken(user._id, res);
+        console.log(token);
         res.status(200).json({
             _id: user._id,
             fullName: user.fullName,
             mail: user.email,
             profilePic: user.profilePic,
+            token
         })
     } catch (error) {
         console.log();
@@ -77,19 +78,25 @@ export const login = async (req, res) => {
 }
 export const logout = (req, res) => {
     try {
+        // Clear the JWT cookie by setting maxAge to 0 and adding security flags
         res.cookie("jwt", "", {
-            maxAge: 0,
-        })
+            maxAge: 0,  // Clears the cookie immediately
+            httpOnly: true,  // Ensures it's not accessible via JavaScript
+            secure: process.env.NODE_ENV === "production",  // Ensures the cookie is sent over HTTPS in production
+            sameSite: "strict",  // Helps prevent CSRF attacks
+        });
+
+        // Respond with a success message
         res.status(200).json({
-            message: "Logout Succesfull!"
-        })
+            message: "Logout Successful!"
+        });
     } catch (error) {
-        console.log("Logout Error :", error);
+        console.log("Logout Error:", error);
         return res.status(500).json({
             message: "Internal Error!"
-        })
+        });
     }
-}
+};
 
 export const updateProfile = async (req, res) => {
     try {
@@ -110,7 +117,7 @@ export const updateProfile = async (req, res) => {
             { profilePic: uploadResponse.secure_url },
             { new: true }
         );
- 
+
         res.status(200).json({ message: "Profile updated successfully!", user: updatedUser });
     } catch (error) {
         console.error("Error updating profile:", error);

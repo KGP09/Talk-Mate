@@ -1,7 +1,7 @@
 import cloudinary from "../lib/cloudinary.js";
+import { getReceiverSocketId, io } from "../lib/socket.io.js";
 import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
-
 export const getUsersForSideBar = async (req, res) => {
     try {
         const loggedInUserID = req.user._id;
@@ -53,6 +53,11 @@ export const sendMessage = async (req, res) => {
             senderId, receiverId, text, image: imageURL
         })
         await newMessage.save()
+
+        const receiverSocketId = getReceiverSocketId(receiverId)
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("newMessage", newMessage);
+        }
         res.status(201).json(newMessage)
     } catch (error) {
         console.log("Error Mesage Controller!");
@@ -61,3 +66,4 @@ export const sendMessage = async (req, res) => {
         })
     }
 }
+
